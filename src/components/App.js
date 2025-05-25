@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from 'react';
+
 import Header from './Header';
 import Main from './Main';
 import Loader from './Loader';
@@ -8,6 +9,10 @@ import Question from './Question';
 import NextButton from './NextButton';
 import Progress from './Progress';
 import FinishScreen from './FinishScreen';
+import Timer from './Timer';
+import Footer from './Footer';
+
+const SECONDS_PER_QUESTION = 30;
 
 const initialState = {
     questions: [],
@@ -17,6 +22,7 @@ const initialState = {
     answer: null,
     points: 0,
     highscore: 0,
+    secondsRemaining: null,
 };
 
 function reducer(state, action) {
@@ -35,7 +41,8 @@ function reducer(state, action) {
         case 'start':
             return {
                 ...state,
-                status: "active"
+                status: "active",
+                secondsRemaining: state.questions.length * SECONDS_PER_QUESTION
             };
         case 'newAnswer':
             const CurQuestion = state.questions.at(state.index);
@@ -65,6 +72,12 @@ function reducer(state, action) {
                 questions: state.questions,
                 status: 'ready',
             }
+        case 'tick':
+            return {
+                ...state,
+                secondsRemaining: state.secondsRemaining - 1,
+                status: state.secondsRemaining === 0 ? 'finished' : state.status
+            }
         default:
             throw new Error("Unknown Action");
     }
@@ -73,7 +86,7 @@ function reducer(state, action) {
 
 export default function App() {
 
-    const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(reducer, initialState)
+    const [{ questions, status, index, answer, points, highscore, secondsRemaining }, dispatch] = useReducer(reducer, initialState)
 
     const numQuestions = questions.length;
     const maxPossiblePoints = questions.reduce((prev, cur) => prev + cur.points, 0)
@@ -113,12 +126,18 @@ export default function App() {
                         dispatch={dispatch}
                         answer={answer}
                     />
-                    <NextButton
-                        dispatch={dispatch}
-                        answer={answer}
-                        index={index}
-                        numQuestions={numQuestions}
-                    />
+                    <Footer>
+                        <Timer
+                            dispatch={dispatch}
+                            secondsRemaining={secondsRemaining}
+                        />
+                        <NextButton
+                            dispatch={dispatch}
+                            answer={answer}
+                            index={index}
+                            numQuestions={numQuestions}
+                        />
+                    </Footer>
                 </>
             }
             {
@@ -134,3 +153,13 @@ export default function App() {
 
     </div>
 }
+
+/* features to be implemented 
+    1- in the start screen could allow user to :
+        - select number of questions 
+        - filter questions by difficulty
+    2- upload the highscore to the fake api 
+        to refetch the value as initial state 
+    3- could store all answers in array to allow user 
+        to go back and forth to review answers   
+*/
