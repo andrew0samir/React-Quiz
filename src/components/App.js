@@ -16,16 +16,7 @@ import { useQuiz } from '../contexts/QuizContext';
 
 export default function App() {
 
-    const { questions,
-        status,
-        index,
-        answer,
-        points,
-        highscore,
-        secondsRemaining,
-        numQuestions,
-        maxPossiblePoints,
-        dispatch } = useQuiz();
+    const { status } = useQuiz();
 
     return <div className="app">
         <Header />
@@ -38,44 +29,22 @@ export default function App() {
                 status === "error" && <Error />
             }
             {
-                status === "ready" && <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
+                status === "ready" && <StartScreen />
             }
             {
                 status === 'active' &&
                 <>
-                    <Progress
-                        index={index}
-                        numQuestions={numQuestions}
-                        points={points}
-                        maxPossiblePoints={maxPossiblePoints}
-                        answer={answer}
-                    />
-                    <Question
-                        question={questions[index]}
-                        dispatch={dispatch}
-                        answer={answer}
-                    />
+                    <Progress />
+                    <Question />
                     <Footer>
-                        <Timer
-                            dispatch={dispatch}
-                            secondsRemaining={secondsRemaining}
-                        />
-                        <NextButton
-                            dispatch={dispatch}
-                            answer={answer}
-                            index={index}
-                            numQuestions={numQuestions}
-                        />
+                        <Timer />
+                        <NextButton />
                     </Footer>
                 </>
             }
             {
                 status === "finished" &&
                 <FinishScreen
-                    points={points}
-                    maxPossiblePoints={maxPossiblePoints}
-                    highscore={highscore}
-                    dispatch={dispatch}
                 />
             }
         </Main>
